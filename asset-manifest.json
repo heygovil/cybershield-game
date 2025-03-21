@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/cybershield-game/static/css/main.a85fe72f.css",
-    "main.js": "/cybershield-game/static/js/main.ed9a81f6.js",
+    "main.css": "/cybershield-game/static/css/main.75cb4838.css",
+    "main.js": "/cybershield-game/static/js/main.712f2b62.js",
     "static/js/453.ba0ba57c.chunk.js": "/cybershield-game/static/js/453.ba0ba57c.chunk.js",
     "index.html": "/cybershield-game/index.html",
-    "main.a85fe72f.css.map": "/cybershield-game/static/css/main.a85fe72f.css.map",
-    "main.ed9a81f6.js.map": "/cybershield-game/static/js/main.ed9a81f6.js.map",
+    "main.75cb4838.css.map": "/cybershield-game/static/css/main.75cb4838.css.map",
+    "main.712f2b62.js.map": "/cybershield-game/static/js/main.712f2b62.js.map",
     "453.ba0ba57c.chunk.js.map": "/cybershield-game/static/js/453.ba0ba57c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.a85fe72f.css",
-    "static/js/main.ed9a81f6.js"
+    "static/css/main.75cb4838.css",
+    "static/js/main.712f2b62.js"
   ]
 }
