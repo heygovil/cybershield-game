@@ -306,7 +306,6 @@ export default function CyberShieldGame() {
         <div className="stats">
           <div className="stat-item">
             Level: {currentLevel.level}
-            <div className="level-badge">{currentLevel.level}</div>
           </div>
           <div className="stat-item">Score: {totalScore}</div>
           {streak >= 2 && (

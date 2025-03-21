@@ -351,23 +351,6 @@ body {
   animation: confetti 2s ease-out forwards;
 }
 
-.level-badge {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background: linear-gradient(135deg, #ffd700, #ffa500);
-  color: white;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  animation: float 3s ease-in-out infinite;
-}
-
 .score-animation {
   position: absolute;
   color: var(--success-color);
