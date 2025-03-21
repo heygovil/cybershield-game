@@ -17,11 +17,55 @@ const levels = [
   {
     level: 2,
     attacks: [
-      { id: 8, sender: "+44 7700 900123", scenario: "This is your mobile carrier. Click this link to claim a free data pack before it expires.", isThreat: true },
-      { id: 9, sender: "+1 (555) 345-6789", scenario: "Your tax refund is ready! Click this link to claim it before the deadline.", isThreat: true },
-      { id: 10, sender: "appstore@verified.com", scenario: "Your friend recommended this app. Download it from the official store here.", isThreat: false },
-      { id: 11, sender: "+61 400 123 456", scenario: "A business partner has shared a confidential document. Open the attachment.", isThreat: true },
-      { id: 12, sender: "hr@yourcompany.com", scenario: "We have updated our employee portal. Log in via the company intranet.", isThreat: false },
+      {
+        id: 8,
+        sender: "System Security <windows-defender@microsoft.windows-security.com>",
+        scenario: "⚠️ MALWARE DETECTED! Your computer is infected with a virus. Download and run antivirus-cleaner.exe to remove threats immediately.",
+        isThreat: true,
+        type: "Malware Distribution"
+      },
+      {
+        id: 9,
+        sender: "CryptoLocker Warning <system@encrypted-files.com>",
+        scenario: "Your files have been encrypted! Send 0.5 BTC to address 1A1zP1... within 24 hours to receive the decryption key.",
+        isThreat: true,
+        type: "Ransomware"
+      },
+      {
+        id: 10,
+        sender: "IT Support (John) <support@helpdesk.company.com>",
+        scenario: "Hi, I'm new to IT support. Could you share your login credentials so I can help set up your new software?",
+        isThreat: true,
+        type: "Social Engineering"
+      },
+      {
+        id: 11,
+        sender: "+1 (555) 0123-4567",
+        scenario: "ALERT: Unusual device login detected on your bank account. Reply with your account number and PIN to secure your account.",
+        isThreat: true,
+        type: "Smishing (SMS Phishing)"
+      },
+      {
+        id: 12,
+        sender: "Chrome Browser <no-reply@google.com>",
+        scenario: "Your browser needs a critical security update. Install this extension to protect your passwords: chrome-security.extension",
+        isThreat: true,
+        type: "Malicious Browser Extension"
+      },
+      {
+        id: 13,
+        sender: "Network Scanner",
+        scenario: "WARNING: Your WiFi network 'Coffee_Shop_Free' is unsecured. Anyone can view your internet traffic.",
+        isThreat: false,
+        type: "Security Alert"
+      },
+      {
+        id: 14,
+        sender: "Windows Firewall",
+        scenario: "A program is requesting network access: Zoom Meeting Client (zoom.us). Allow or Block?",
+        isThreat: false,
+        type: "Legitimate Security Prompt"
+      }
     ],
   },
   {
@@ -130,15 +174,33 @@ export default function CyberShieldGame() {
   const currentLevel = levels[currentLevelIndex];
   const currentScenario = currentLevel.attacks[currentScenarioIndex];
 
-  const getFeedbackMessage = (isCorrect, isThreat) => {
+  const getFeedbackMessage = (isCorrect, scenario) => {
     if (isCorrect) {
-      return isThreat 
-        ? "Great catch! This was indeed a phishing attempt." 
-        : "Correct! This was a legitimate message.";
+      if (scenario.isThreat) {
+        const tips = {
+          "Malware Distribution": "Good catch! Never download executable files (.exe) from unknown sources. Legitimate antivirus software doesn't distribute updates this way.",
+          "Ransomware": "Excellent! Ransomware attacks often demand cryptocurrency payments. Always keep backups of your important files.",
+          "Social Engineering": "Well done! Never share your credentials, even with IT staff. Legitimate IT support will never ask for your password.",
+          "Smishing (SMS Phishing)": "Great job! Banks never request sensitive information via SMS. Always use official banking apps or websites.",
+          "Malicious Browser Extension": "Perfect! Browser updates come through the browser itself, not via email. Only install extensions from official web stores.",
+          "Phishing": "Good eye! This is a phishing attempt trying to steal your information. Always verify urgent requests through official channels."
+        };
+        return tips[scenario.type] || "Great catch! This was indeed a security threat.";
+      }
+      return "Correct! This is a legitimate message that requires appropriate action.";
     }
-    return isThreat 
-      ? "Oops! This was actually a phishing attempt. Look out for suspicious links and urgent requests." 
-      : "This was actually safe. Remember to balance security with usability.";
+    
+    const mistakes = {
+      "Malware Distribution": "Be careful! This is a malware distribution attempt. Legitimate security software doesn't send executable files via email.",
+      "Ransomware": "Watch out! This is a ransomware attack. Never pay the ransom - it doesn't guarantee file recovery.",
+      "Social Engineering": "Be vigilant! This is a social engineering attack trying to manipulate you into sharing sensitive information.",
+      "Smishing (SMS Phishing)": "Stay alert! This is an SMS phishing attempt. Never send sensitive information via text messages.",
+      "Malicious Browser Extension": "Warning! This is attempting to trick you into installing malicious software. Browser updates come through the browser itself.",
+      "Phishing": "Be careful! This was a phishing attempt. Always verify urgent requests through official channels."
+    };
+    return scenario.isThreat 
+      ? (mistakes[scenario.type] || "This was actually a security threat. Always be cautious with unexpected messages.")
+      : "This was actually safe. While it's good to be cautious, some security prompts are legitimate.";
   };
 
   const handleResponse = (isThreatSelected) => {
@@ -154,7 +216,7 @@ export default function CyberShieldGame() {
     }
 
     setFeedback({
-      message: getFeedbackMessage(isCorrect, currentScenario.isThreat),
+      message: getFeedbackMessage(isCorrect, currentScenario),
       isCorrect
     });
     setShowFeedback(true);
@@ -232,6 +294,11 @@ export default function CyberShieldGame() {
             </div>
             <div className="message-content">
               <h3>From: {currentScenario.sender}</h3>
+              {currentScenario.type && (
+                <div className="attack-type">
+                  Type: {currentScenario.type}
+                </div>
+              )}
               <p>{currentScenario.scenario}</p>
             </div>
             {showFeedback ? (
@@ -241,7 +308,7 @@ export default function CyberShieldGame() {
             ) : (
               <div className="buttons">
                 <button className="threat-btn" onClick={() => handleResponse(true)}>
-                  ⚠️ Potential Threat
+                  ⚠️ Security Threat
                 </button>
                 <button className="safe-btn" onClick={() => handleResponse(false)}>
                   ✅ Safe
@@ -250,12 +317,13 @@ export default function CyberShieldGame() {
             )}
           </div>
           <div className="tips">
-            <h3>🔍 Remember to check for:</h3>
+            <h3>🔍 Security Tips:</h3>
             <ul>
-              <li>Suspicious sender addresses</li>
-              <li>Urgent or threatening language</li>
-              <li>Unusual requests</li>
-              <li>Grammar and spelling errors</li>
+              <li>Never download executable files (.exe) from emails</li>
+              <li>Be suspicious of urgent or threatening messages</li>
+              <li>Don't share passwords or sensitive info via email/SMS</li>
+              <li>Verify requests through official channels</li>
+              <li>Keep your software updated through official sources</li>
             </ul>
           </div>
         </div>
