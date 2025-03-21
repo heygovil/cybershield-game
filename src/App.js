@@ -170,9 +170,45 @@ export default function CyberShieldGame() {
   const [feedback, setFeedback] = useState({ message: "", isCorrect: null });
   const [showFeedback, setShowFeedback] = useState(false);
   const [streak, setStreak] = useState(0);
+  const [confetti, setConfetti] = useState([]);
+  const [showScoreAnimation, setShowScoreAnimation] = useState(false);
 
   const currentLevel = levels[currentLevelIndex];
   const currentScenario = currentLevel.attacks[currentScenarioIndex];
+  const progress = ((currentScenarioIndex) / currentLevel.attacks.length) * 100;
+
+  useEffect(() => {
+    if (showScoreAnimation) {
+      const timer = setTimeout(() => {
+        setShowScoreAnimation(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [showScoreAnimation]);
+
+  const createConfetti = () => {
+    const confettiCount = 50;
+    const newConfetti = [];
+    
+    for (let i = 0; i < confettiCount; i++) {
+      newConfetti.push({
+        id: i,
+        left: `${Math.random() * 100}%`,
+        animationDuration: `${Math.random() * 2 + 1}s`,
+        backgroundColor: `hsl(${Math.random() * 360}, 70%, 50%)`
+      });
+    }
+    
+    setConfetti(newConfetti);
+    setTimeout(() => setConfetti([]), 2000);
+  };
+
+  const getEmojiReaction = (isCorrect) => {
+    if (isCorrect) {
+      return streak >= 3 ? "🎯" : "✨";
+    }
+    return "💡";
+  };
 
   const getFeedbackMessage = (isCorrect, scenario) => {
     if (isCorrect) {
@@ -211,6 +247,10 @@ export default function CyberShieldGame() {
       setScore((prev) => prev + 1);
       newTotalScore += 1;
       setStreak(prev => prev + 1);
+      setShowScoreAnimation(true);
+      if (streak >= 2) {
+        createConfetti();
+      }
     } else {
       setStreak(0);
     }
@@ -221,13 +261,15 @@ export default function CyberShieldGame() {
     });
     setShowFeedback(true);
 
-    // Hide feedback after 3 seconds
     setTimeout(() => {
       setShowFeedback(false);
       if (currentScenarioIndex < currentLevel.attacks.length - 1) {
         setCurrentScenarioIndex(currentScenarioIndex + 1);
       } else {
         setShowLevelScore(true);
+        if (score >= currentLevel.attacks.length * 0.8) {
+          createConfetti();
+        }
       }
     }, 3000);
 
@@ -247,12 +289,31 @@ export default function CyberShieldGame() {
 
   return (
     <div className="container">
+      {confetti.map((c) => (
+        <div
+          key={c.id}
+          className="confetti"
+          style={{
+            left: c.left,
+            animationDuration: c.animationDuration,
+            backgroundColor: c.backgroundColor
+          }}
+        />
+      ))}
+      
       <div className="game-header">
         <h1>CyberShield: Defend the Network</h1>
         <div className="stats">
-          <div className="stat-item">Level: {currentLevel.level}</div>
+          <div className="stat-item">
+            Level: {currentLevel.level}
+            <div className="level-badge">{currentLevel.level}</div>
+          </div>
           <div className="stat-item">Score: {totalScore}</div>
-          <div className="stat-item">Streak: {streak}</div>
+          {streak >= 2 && (
+            <div className="streak-counter">
+              {streak} Streak
+            </div>
+          )}
         </div>
       </div>
       
@@ -279,7 +340,7 @@ export default function CyberShieldGame() {
                 ? "👍 Good job! Keep practicing to improve." 
                 : "📚 Keep learning! Review the common signs of phishing."}
           </div>
-          <button className="next-btn" onClick={handleNextLevel}>
+          <button className="next-btn button-hover-effect" onClick={handleNextLevel}>
             Next Level
           </button>
         </div>
@@ -292,30 +353,60 @@ export default function CyberShieldGame() {
                 Scenario {currentScenarioIndex + 1}/{currentLevel.attacks.length}
               </div>
             </div>
+            
+            <div className="progress-container">
+              <div 
+                className="progress-bar" 
+                style={{ 
+                  width: `${progress}%`,
+                  '--progress-width': `${progress}%`
+                }} 
+              />
+            </div>
+
             <div className="message-content">
               <h3>From: {currentScenario.sender}</h3>
               {currentScenario.type && (
                 <div className="attack-type">
-                  Type: {currentScenario.type}
+                  {currentScenario.type}
                 </div>
               )}
               <p>{currentScenario.scenario}</p>
             </div>
-            {showFeedback ? (
-              <div className={`feedback ${feedback.isCorrect ? 'correct' : 'incorrect'}`}>
-                {feedback.message}
+
+            {showScoreAnimation && (
+              <div 
+                className="score-animation"
+                style={{
+                  left: `${Math.random() * 80 + 10}%`,
+                  top: `${Math.random() * 40 + 30}%`
+                }}
+              >
+                +1
               </div>
+            )}
+
+            {showFeedback ? (
+              <>
+                <div className="emoji-reaction">
+                  {getEmojiReaction(feedback.isCorrect)}
+                </div>
+                <div className={`feedback ${feedback.isCorrect ? 'correct' : 'incorrect'}`}>
+                  {feedback.message}
+                </div>
+              </>
             ) : (
               <div className="buttons">
-                <button className="threat-btn" onClick={() => handleResponse(true)}>
+                <button className="threat-btn button-hover-effect" onClick={() => handleResponse(true)}>
                   ⚠️ Security Threat
                 </button>
-                <button className="safe-btn" onClick={() => handleResponse(false)}>
+                <button className="safe-btn button-hover-effect" onClick={() => handleResponse(false)}>
                   ✅ Safe
                 </button>
               </div>
             )}
           </div>
+
           <div className="tips">
             <h3>🔍 Security Tips:</h3>
             <ul>
